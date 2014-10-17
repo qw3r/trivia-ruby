@@ -1,5 +1,5 @@
 require 'spec_helper'
-PROJECT_ROOT="~/Work/retreat/trivia/ruby"
+PROJECT_ROOT="./"
 
 
 describe "Characteristic test" do
