@@ -1,5 +1,6 @@
 module UglyTrivia
   class Game
+    COINS_REQUIRED_TO_WIN = 6
 
     def initialize
       @players = []
@@ -39,52 +40,29 @@ module UglyTrivia
       puts "They have rolled a #{roll}"
 
       if @in_penalty_box[@current_player]
-        if roll % 2 != 0
-          @is_getting_out_of_penalty_box = true
-
-          puts "#{@players[@current_player]} is getting out of the penalty box"
-          step(roll)
-        else
+        if roll % 2 == 0
           puts "#{@players[@current_player]} is not getting out of the penalty box"
           @is_getting_out_of_penalty_box = false
+
+          return
         end
 
-      else
-
-        step(roll)
+        @is_getting_out_of_penalty_box = true
+        puts "#{@players[@current_player]} is getting out of the penalty box"
       end
+
+      step(roll)
+
+      ask_question
     end
 
 
 
     def was_correctly_answered
-      if @in_penalty_box[@current_player]
-        if @is_getting_out_of_penalty_box
-          puts 'Answer was correct!!!!'
-          @purses[@current_player] += 1
-          puts "#{@players[@current_player]} now has #{@purses[@current_player]} Gold Coins."
-
-          winner = player_is_still_playing
-          next_player
-
-          winner
-        else
-          next_player
-
-          true
-        end
+      return true if (@in_penalty_box[@current_player] && !@is_getting_out_of_penalty_box)
 
 
-      else
-        puts "Answer was corrent!!!!"
-        @purses[@current_player] += 1
-        puts "#{@players[@current_player]} now has #{@purses[@current_player]} Gold Coins."
-
-        winner = player_is_still_playing
-        next_player
-
-        winner
-      end
+      reward_correct_answer
     end
 
 
@@ -93,9 +71,20 @@ module UglyTrivia
       puts 'Question was incorrectly answered'
       puts "#{@players[@current_player]} was sent to the penalty box"
       @in_penalty_box[@current_player] = true
+    end
 
-      next_player
-      return true
+
+
+    def next_player
+      @current_player += 1
+      @current_player = 0 if @current_player == number_of_players
+    end
+
+
+
+
+    def is_finished?
+      @purses.max >= COINS_REQUIRED_TO_WIN
     end
 
 
@@ -124,13 +113,9 @@ module UglyTrivia
       @places[@current_player] = @places[@current_player] - 12 if @places[@current_player] > 11
 
       puts "#{@players[@current_player]}'s new location is #{@places[@current_player]}"
-      puts "The category is #{current_category}"
-      ask_question
     end
 
 
-
-    private
 
     def is_playable?
       number_of_players >= 2
@@ -139,38 +124,44 @@ module UglyTrivia
 
 
     def ask_question
-      puts @pop_questions.shift if current_category == 'Pop'
-      puts @science_questions.shift if current_category == 'Science'
-      puts @sports_questions.shift if current_category == 'Sports'
-      puts @rock_questions.shift if current_category == 'Rock'
+      current_category = determine_current_category
+
+      puts "The category is #{current_category}"
+
+      case current_category
+        when 'Pop'
+          puts @pop_questions.shift
+        when 'Science'
+          puts @science_questions.shift
+        when 'Sports'
+          puts @sports_questions.shift
+        when 'Rock'
+          puts @rock_questions.shift
+      end
     end
 
 
 
-    def current_category
-      return 'Pop' if @places[@current_player] == 0
-      return 'Pop' if @places[@current_player] == 4
-      return 'Pop' if @places[@current_player] == 8
-      return 'Science' if @places[@current_player] == 1
-      return 'Science' if @places[@current_player] == 5
-      return 'Science' if @places[@current_player] == 9
-      return 'Sports' if @places[@current_player] == 2
-      return 'Sports' if @places[@current_player] == 6
-      return 'Sports' if @places[@current_player] == 10
-      return 'Rock'
+    def determine_current_category
+      case @places[@current_player]
+        when 0, 4, 8
+          'Pop'
+        when 1, 5, 9
+          'Science'
+        when 2, 6, 10
+          'Sports'
+        else
+          'Rock'
+      end
     end
 
 
 
-    def next_player
-      @current_player += 1
-      @current_player = 0 if @current_player == number_of_players
+    def reward_correct_answer
+      puts "Answer was correct!!!!"
+      @purses[@current_player] += 1
+      puts "#{@players[@current_player]} now has #{@purses[@current_player]} Gold Coins."
     end
 
-
-
-    def player_is_still_playing
-      !(@purses[@current_player] == 6)
-    end
   end
 end

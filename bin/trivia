@@ -3,6 +3,7 @@ $:.unshift(File.dirname(__FILE__) + '/../lib')
 
 require 'ugly_trivia/game'
 
+
 gen = Random.new ENV['SEED'].to_i || 1
 
 not_a_winner = false
@@ -13,18 +14,16 @@ game.add 'Chet'
 game.add 'Pat'
 game.add 'Sue'
 
-begin
-  
+while !game.is_finished?
+
   game.roll(gen.rand(5) + 1)
 
-  
+
   if gen.rand(9) == 7
-    not_a_winner = game.wrong_answer
+    game.wrong_answer
   else
-    not_a_winner = game.was_correctly_answered
+    game.was_correctly_answered
   end
 
-
-  
-  
-end while not_a_winner
+  game.next_player
+end
