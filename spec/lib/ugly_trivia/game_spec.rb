@@ -12,5 +12,4 @@ describe UglyTrivia::Game do
     end
   end
 
-
 end

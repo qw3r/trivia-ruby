@@ -36,4 +36,12 @@ describe UglyTrivia::Player do
     end
   end
 
+  describe "#step" do
+    it "should step the player into next position" do
+      subject.step(3)
+
+      expect(subject.position).to eq 3
+    end
   end
+
+end
