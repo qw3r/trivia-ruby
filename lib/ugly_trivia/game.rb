@@ -32,6 +32,7 @@ module UglyTrivia
       puts "They have rolled a #{roll}"
 
       if current_player.in_penalty?
+
         if roll % 2 == 0
           puts "#{current_player.name} is not getting out of the penalty box"
           @is_getting_out_of_penalty_box = false
@@ -61,6 +62,7 @@ module UglyTrivia
     def wrong_answer
       puts 'Question was incorrectly answered'
       puts "#{current_player.name} was sent to the penalty box"
+
       current_player.in_penalty!
     end
 
@@ -93,6 +95,7 @@ module UglyTrivia
 
       %w[Pop Science Sports Rock].each do |category_name|
         category = Category.new(category_name)
+
         50.times { |i| category.add_question "#{category_name} Question #{i}" }
 
         @categories[category_name] = category
@@ -111,12 +114,6 @@ module UglyTrivia
       current_player.step roll
 
       puts "#{current_player.name}'s new location is #{current_player.position}"
-    end
-
-
-
-    def is_playable?
-      number_of_players >= 2
     end
 
 
@@ -150,8 +147,9 @@ module UglyTrivia
 
 
     def reward_correct_answer
-      puts "Answer was correct!!!!"
       current_player.coins += current_category.value
+
+      puts "Answer was correct!!!!"
       puts "#{current_player.name} now has #{current_player.coins} Gold Coins."
     end
 
