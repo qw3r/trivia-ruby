@@ -1,4 +1,5 @@
 require_relative './player'
+require_relative './category'
 
 module UglyTrivia
   class Game
@@ -8,16 +9,10 @@ module UglyTrivia
 
     def initialize
       @players = []
-      @current_player = 0
-
-      @pop_questions = []
-      @science_questions = []
-      @sports_questions = []
-      @rock_questions = []
-
+      @current_players_index = 0
       @is_getting_out_of_penalty_box = false
 
-      create_questions
+      create_categories_and_question
     end
 
 
@@ -72,8 +67,8 @@ module UglyTrivia
 
 
     def next_player
-      @current_player += 1
-      @current_player = 0 if @current_player == number_of_players
+      @current_players_index += 1
+      @current_players_index = 0 if @current_players_index == number_of_players
     end
 
 
@@ -88,17 +83,19 @@ module UglyTrivia
 
 
     def current_player
-      @players[@current_player]
+      @players[@current_players_index]
     end
 
 
 
-    def create_questions
-      50.times do |i|
-        @pop_questions.push "Pop Question #{i}"
-        @science_questions.push "Science Question #{i}"
-        @sports_questions.push "Sports Question #{i}"
-        @rock_questions.push "Rock Question #{i}"
+    def create_categories_and_question
+      @categories = {}
+
+      %w[Pop Science Sports Rock].each do |category_name|
+        category = Category.new(category_name)
+        50.times { |i| category.add_question "#{category_name} Question #{i}" }
+
+        @categories[category_name] = category
       end
     end
 
@@ -125,25 +122,19 @@ module UglyTrivia
 
 
     def ask_question
-      current_category = determine_current_category
-
-      puts "The category is #{current_category}"
-
-      case current_category
-        when 'Pop'
-          puts @pop_questions.shift
-        when 'Science'
-          puts @science_questions.shift
-        when 'Sports'
-          puts @sports_questions.shift
-        when 'Rock'
-          puts @rock_questions.shift
-      end
+      puts "The category is #{current_category.name}"
+      puts current_category.next_question
     end
 
 
 
-    def determine_current_category
+    def current_category
+      @categories[category_of_the_current_position]
+    end
+
+
+
+    def category_of_the_current_position
       case current_player.position
         when 0, 4, 8
           'Pop'
@@ -160,7 +151,7 @@ module UglyTrivia
 
     def reward_correct_answer
       puts "Answer was correct!!!!"
-      current_player.coins += 1
+      current_player.coins += current_category.value
       puts "#{current_player.name} now has #{current_player.coins} Gold Coins."
     end
 
