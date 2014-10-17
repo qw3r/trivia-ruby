@@ -1,6 +1,6 @@
 module UglyTrivia
   class Game
-    def  initialize
+    def initialize
       @players = []
       @places = Array.new(6, 0)
       @purses = Array.new(6, 0)
@@ -22,13 +22,19 @@ module UglyTrivia
       end
     end
 
+
+
     def create_rock_question(index)
       "Rock Question #{index}"
     end
 
+
+
     def is_playable?
       how_many_players >= 2
     end
+
+
 
     def add(player_name)
       @players.push player_name
@@ -42,9 +48,13 @@ module UglyTrivia
       true
     end
 
+
+
     def how_many_players
       @players.length
     end
+
+
 
     def roll(roll)
       puts "\n#{@players[@current_player]} is the current player"
@@ -59,7 +69,7 @@ module UglyTrivia
         else
           puts "#{@players[@current_player]} is not getting out of the penalty box"
           @is_getting_out_of_penalty_box = false
-          end
+        end
 
       else
 
@@ -89,6 +99,8 @@ module UglyTrivia
       puts @rock_questions.shift if current_category == 'Rock'
     end
 
+
+
     def current_category
       return 'Pop' if @places[@current_player] == 0
       return 'Pop' if @places[@current_player] == 4
@@ -102,7 +114,9 @@ module UglyTrivia
       return 'Rock'
     end
 
-  public
+
+
+    public
 
     def was_correctly_answered
       if @in_penalty_box[@current_player]
@@ -121,9 +135,7 @@ module UglyTrivia
         end
 
 
-
       else
-
         puts "Answer was corrent!!!!"
         @purses[@current_player] += 1
         puts "#{@players[@current_player]} now has #{@purses[@current_player]} Gold Coins."
@@ -137,23 +149,24 @@ module UglyTrivia
 
 
 
-
-
     def wrong_answer
-  		puts 'Question was incorrectly answered'
-  		puts "#{@players[@current_player]} was sent to the penalty box"
-  		@in_penalty_box[@current_player] = true
+      puts 'Question was incorrectly answered'
+      puts "#{@players[@current_player]} was sent to the penalty box"
+      @in_penalty_box[@current_player] = true
 
       next_player
-  		return true
+      return true
     end
 
-  private
+
+
+    private
 
     def next_player
       @current_player += 1
       @current_player = 0 if @current_player == @players.length
     end
+
 
 
     def did_player_win
