@@ -111,8 +111,7 @@ module UglyTrivia
 
 
     def step(roll)
-      current_player.position = current_player.position + roll
-      current_player.position = current_player.position - 12 if current_player.position > 11
+      current_player.step roll
 
       puts "#{current_player.name}'s new location is #{current_player.position}"
     end

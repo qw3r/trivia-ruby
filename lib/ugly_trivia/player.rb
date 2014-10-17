@@ -27,8 +27,6 @@ module UglyTrivia
     def step(roll)
       @position = @position + roll
       @position = @position - 12 if @position > 11
-
-      puts "#{name}'s new location is #{position}"
     end
 
   end
