@@ -1,19 +1,20 @@
+require_relative './player'
+
 module UglyTrivia
   class Game
     COINS_REQUIRED_TO_WIN = 6
 
+
+
     def initialize
       @players = []
-      @places = Array.new(6, 0)
-      @purses = Array.new(6, 0)
-      @in_penalty_box = Array.new(6, nil)
+      @current_player = 0
 
       @pop_questions = []
       @science_questions = []
       @sports_questions = []
       @rock_questions = []
 
-      @current_player = 0
       @is_getting_out_of_penalty_box = false
 
       create_questions
@@ -22,33 +23,29 @@ module UglyTrivia
 
 
     def add(player_name)
-      @players.push player_name
-      @places[number_of_players] = 0
-      @purses[number_of_players] = 0
-      @in_penalty_box[number_of_players] = false
+      @players.push Player.new(player_name)
 
       puts "#{player_name} was added"
       puts "They are player number #{number_of_players}"
-
       true
     end
 
 
 
     def roll(roll)
-      puts "\n#{@players[@current_player]} is the current player"
+      puts "\n#{current_player.name} is the current player"
       puts "They have rolled a #{roll}"
 
-      if @in_penalty_box[@current_player]
+      if current_player.in_penalty?
         if roll % 2 == 0
-          puts "#{@players[@current_player]} is not getting out of the penalty box"
+          puts "#{current_player.name} is not getting out of the penalty box"
           @is_getting_out_of_penalty_box = false
 
           return
         end
 
         @is_getting_out_of_penalty_box = true
-        puts "#{@players[@current_player]} is getting out of the penalty box"
+        puts "#{current_player.name} is getting out of the penalty box"
       end
 
       step(roll)
@@ -59,8 +56,7 @@ module UglyTrivia
 
 
     def was_correctly_answered
-      return true if (@in_penalty_box[@current_player] && !@is_getting_out_of_penalty_box)
-
+      return true if (current_player.in_penalty? && !@is_getting_out_of_penalty_box)
 
       reward_correct_answer
     end
@@ -69,8 +65,8 @@ module UglyTrivia
 
     def wrong_answer
       puts 'Question was incorrectly answered'
-      puts "#{@players[@current_player]} was sent to the penalty box"
-      @in_penalty_box[@current_player] = true
+      puts "#{current_player.name} was sent to the penalty box"
+      current_player.in_penalty!
     end
 
 
@@ -82,14 +78,20 @@ module UglyTrivia
 
 
 
-
     def is_finished?
-      @purses.max >= COINS_REQUIRED_TO_WIN
+      @players.map(&:coins).max >= COINS_REQUIRED_TO_WIN
     end
 
 
 
     private
+
+
+    def current_player
+      @players[@current_player]
+    end
+
+
 
     def create_questions
       50.times do |i|
@@ -109,10 +111,10 @@ module UglyTrivia
 
 
     def step(roll)
-      @places[@current_player] = @places[@current_player] + roll
-      @places[@current_player] = @places[@current_player] - 12 if @places[@current_player] > 11
+      current_player.position = current_player.position + roll
+      current_player.position = current_player.position - 12 if current_player.position > 11
 
-      puts "#{@players[@current_player]}'s new location is #{@places[@current_player]}"
+      puts "#{current_player.name}'s new location is #{current_player.position}"
     end
 
 
@@ -143,7 +145,7 @@ module UglyTrivia
 
 
     def determine_current_category
-      case @places[@current_player]
+      case current_player.position
         when 0, 4, 8
           'Pop'
         when 1, 5, 9
@@ -159,8 +161,8 @@ module UglyTrivia
 
     def reward_correct_answer
       puts "Answer was correct!!!!"
-      @purses[@current_player] += 1
-      puts "#{@players[@current_player]} now has #{@purses[@current_player]} Gold Coins."
+      current_player.coins += 1
+      puts "#{current_player.name} now has #{current_player.coins} Gold Coins."
     end
 
   end
